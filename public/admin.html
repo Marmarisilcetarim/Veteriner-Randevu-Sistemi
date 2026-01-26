@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yönetici Paneli - Veteriner Randevu Sistemi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Login Section -->
+        <div id="loginSection">
+            <div class="header">
+                <h1>Yönetici Paneli</h1>
+                <p>Veteriner Randevu Sistemi</p>
+            </div>
+
+            <div class="card" style="max-width: 400px; margin: 0 auto;">
+                <img src="images/admin-login.png" alt="Admin" class="card-image">
+                <h2 class="text-center mb-3">Giriş Yap</h2>
+
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label">Parola</label>
+                        <input type="password" class="form-input" id="password" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">
+                        Giriş Yap
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div id="adminPanel" class="hidden">
+            <div class="header">
+                <h1>Yönetici Paneli</h1>
+                <p>Randevu Yönetimi</p>
+            </div>
+
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="filterAppointments('all')">
+                        Tüm Randevular
+                    </button>
+                    <button class="btn btn-secondary" onclick="filterAppointments('active')">
+                        Aktif Randevular
+                    </button>
+                    <button class="btn btn-outline" onclick="filterAppointments('cancelled')">
+                        İptal Edilmiş
+                    </button>
+                </div>
+                <button class="btn btn-danger" onclick="logout()">
+                    Çıkış Yap
+                </button>
+            </div>
+
+            <div class="card">
+                <div id="appointmentsContainer">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Modal -->
+        <div id="editModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Randevu Düzenle</h2>
+                    <button class="modal-close" onclick="closeEditModal()">×</button>
+                </div>
+
+                <form id="editForm">
+                    <input type="hidden" id="editId">
+
+                    <div class="form-group">
+                        <label class="form-label">Ad Soyad</label>
+                        <input type="text" class="form-input" id="editFullName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Telefon</label>
+                        <input type="tel" class="form-input" id="editPhone" required>
+                    </div>
+
+                    <div class="form-group" id="editCountryGroup">
+                        <label class="form-label">Ülke</label>
+                        <input type="text" class="form-input" id="editCountry">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Hayvan Türü</label>
+                        <input type="text" class="form-input" id="editAnimalType" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Hayvan Sayısı</label>
+                        <input type="number" class="form-input" id="editAnimalCount" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Tarih</label>
+                        <input type="date" class="form-input" id="editDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Saat</label>
+                        <select class="form-select" id="editTime" required>
+                            <option value="10:00">10:00</option>
+                            <option value="10:30">10:30</option>
+                            <option value="11:00">11:00</option>
+                            <option value="11:30">11:30</option>
+                            <option value="12:00">12:00</option>
+                            <option value="14:00">14:00</option>
+                            <option value="14:30">14:30</option>
+                            <option value="15:00">15:00</option>
+                            <option value="15:30">15:30</option>
+                            <option value="16:00">16:00</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">
+                        Kaydet
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+
+</html>

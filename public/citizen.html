@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Randevu - Veteriner Randevu Sistemi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 id="mainTitle">Veteriner Randevu Sistemi</h1>
+            <p id="mainSubtitle">Marmaris İlçe Tarım ve Orman Müdürlüğü</p>
+        </div>
+
+        <!-- Language Selector -->
+        <div class="language-selector">
+            <button class="language-btn" data-lang="tr">🇹🇷 Türkçe</button>
+            <button class="language-btn" data-lang="en">🇬🇧 English</button>
+            <button class="language-btn" data-lang="de">🇩🇪 Deutsch</button>
+            <button class="language-btn" data-lang="ru">🇷🇺 Русский</button>
+        </div>
+
+        <!-- Back Button -->
+        <button class="btn btn-outline mb-3" onclick="goBack()">
+            ← <span id="backBtn">Geri</span>
+        </button>
+
+        <!-- Step 1: Appointment Type Selection (for booking mode) -->
+        <div id="appointmentTypeSection" class="hidden">
+            <div class="card">
+                <h2 class="text-center mb-3" id="selectTypeTitle">Randevu Tipi Seçiniz</h2>
+                <div class="card-grid">
+                    <button class="btn btn-primary btn-block" onclick="selectAppointmentType('health_certificate')">
+                        <img src="images/yurtdisi-sertifika.png"
+                            alt="Yurtdışı Yolcu Beraberi Veteriner Sağlık Sertifikası" class="card-image">
+                        <span id="healthCertBtn">Yurtdışı Yolcu Beraberi Veteriner Sağlık Sertifikası</span>
+                    </button>
+                    <button class="btn btn-secondary btn-block" onclick="selectAppointmentType('microchip')">
+                        <img src="images/mikrochip.png" alt="Mikroçip Uygulaması" class="card-image">
+                        <span id="microchipBtn">Mikroçip Uygulaması</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Appointment Form -->
+        <div id="appointmentFormSection" class="hidden">
+            <div class="card">
+                <h2 class="text-center mb-3" id="formTitle">Randevu Formu</h2>
+
+                <!-- Health Certificate Warning -->
+                <div id="healthWarning" class="alert alert-warning hidden">
+                    <strong id="warningTitle">Önemli Bilgilendirme:</strong>
+                    <p id="warningText" class="mb-1"></p>
+                    <p id="warningNote"></p>
+                </div>
+
+                <form id="appointmentForm">
+                    <div class="form-group">
+                        <label class="form-label" id="fullNameLabel">Adınız Soyadınız</label>
+                        <input type="text" class="form-input" id="fullName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" id="phoneLabel">Telefon Numaranız</label>
+                        <input type="tel" class="form-input" id="phone" required>
+                    </div>
+
+                    <div class="form-group" id="countryGroup">
+                        <label class="form-label" id="countryLabel">Gideceğiniz Ülke</label>
+                        <input type="text" class="form-input" id="country">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" id="animalTypeLabel">Hayvanın Türü</label>
+                        <select class="form-select" id="animalType" required>
+                            <option value="">Seçiniz</option>
+                            <option value="dog" id="dogOption">Köpek</option>
+                            <option value="cat" id="catOption">Kedi</option>
+                            <option value="bird" id="birdOption">Kuş</option>
+                            <option value="other" id="otherOption">Diğer</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" id="animalCountLabel">Hayvan Sayısı</label>
+                        <input type="number" class="form-input" id="animalCount" min="1" value="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" id="appointmentDateLabel">Randevu Tarihi</label>
+                        <input type="date" class="form-input" id="appointmentDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" id="appointmentTimeLabel">Randevu Saati</label>
+                        <select class="form-select" id="appointmentTime" required>
+                            <option value="">Önce tarih seçiniz</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+                        Randevu Oluştur
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div id="searchSection" class="hidden">
+            <div class="card">
+                <h2 class="text-center mb-3" id="searchTitle">Randevu Sorgula/İptal</h2>
+
+                <div class="form-group">
+                    <label class="form-label" id="enterNumberLabel">Randevu Numaranızı Giriniz</label>
+                    <input type="text" class="form-input" id="searchNumber" placeholder="RND480001">
+                </div>
+
+                <button class="btn btn-primary btn-block" onclick="searchAppointment()" id="searchBtn">
+                    Sorgula
+                </button>
+
+                <div id="searchResult" class="hidden mt-3"></div>
+            </div>
+        </div>
+
+        <!-- Success Modal -->
+        <div id="successModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="successTitle">Başarılı!</h2>
+                    <button class="modal-close" onclick="closeSuccessModal()">×</button>
+                </div>
+                <div class="alert alert-success">
+                    <p id="successMessage"></p>
+                    <p class="text-center" style="font-size: 1.5rem; font-weight: 700; margin: 1rem 0;"
+                        id="appointmentNumberDisplay"></p>
+                    <p id="successNote"></p>
+                </div>
+                <button class="btn btn-primary btn-block" onclick="closeSuccessModal()">
+                    <span id="closeBtn">Kapat</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Cancel Confirmation Modal -->
+        <div id="cancelModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="cancelTitle">Randevu İptali</h2>
+                    <button class="modal-close" onclick="closeCancelModal()">×</button>
+                </div>
+                <p id="cancelConfirmText" class="mb-3"></p>
+                <div class="form-group">
+                    <label class="form-label" id="confirmPhoneLabel">Telefon Numaranızı Giriniz</label>
+                    <input type="tel" class="form-input" id="confirmPhone">
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn btn-outline" onclick="closeCancelModal()" style="flex: 1;">
+                        <span id="cancelBackBtn">İptal</span>
+                    </button>
+                    <button class="btn btn-danger" onclick="confirmCancel()" style="flex: 1;" id="confirmCancelBtn">
+                        İptal Et
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/translations.js"></script>
+    <script src="js/citizen.js"></script>
+</body>
+
+</html>

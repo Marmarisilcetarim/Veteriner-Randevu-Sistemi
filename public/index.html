@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Veteriner Randevu Sistemi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <!-- Language Selector - Top Right -->
+      <div class="language-selector-top">
+        <button class="language-btn active" data-lang="tr">🇹🇷</button>
+        <button class="language-btn" data-lang="en">🇬🇧</button>
+        <button class="language-btn" data-lang="de">🇩🇪</button>
+        <button class="language-btn" data-lang="ru">🇷🇺</button>
+      </div>
+
+      <h1 id="mainTitle">Veteriner Randevu Sistemi</h1>
+      <p id="mainSubtitle">Marmaris İlçe Tarım ve Orman Müdürlüğü</p>
+
+      <!-- Main Logo Image -->
+      <img src="images/ana-ekran-yeni.png" alt="Veteriner Randevu Sistemi" class="header-logo">
+    </div>
+
+    <!-- Main Menu -->
+    <div class="card-grid">
+      <!-- Card 1: Health Certificate -->
+      <div class="card" onclick="goToCitizen('book', 'health_certificate')" style="cursor: pointer;">
+        <img src="images/yurtdisi-sertifika.png" alt="Yurtdışı Yolcu Beraberi Veteriner Sertifikası" class="card-image">
+        <h2 class="text-center mb-2" id="healthCertTitle">Yurtdışı Yolcu Beraberi Veteriner Sertifikası</h2>
+      </div>
+
+      <!-- Card 2: Microchip -->
+      <div class="card" onclick="goToCitizen('book', 'microchip')" style="cursor: pointer;">
+        <img src="images/mikrocip-yeni.png" alt="Mikroçip Uygulama" class="card-image">
+        <h2 class="text-center mb-2" id="microchipTitle">Mikroçip Uygulama</h2>
+      </div>
+
+      <!-- Card 3: Search/Cancel -->
+      <div class="card" onclick="goToCitizen('search')" style="cursor: pointer;">
+        <img src="images/randevu-sorgula.png" alt="Randevu Sorgula / İptal" class="card-image">
+        <h2 class="text-center mb-2" id="searchTitle">Randevu Sorgula / İptal</h2>
+      </div>
+    </div>
+
+    <!-- Admin Login (Footer) -->
+    <div
+      style="text-align: center; margin-top: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; opacity: 0.8;">
+      <img src="images/admin-icon.png" alt="Admin" style="width: 24px; height: 24px;">
+      <button class="btn btn-outline btn-sm" onclick="goToAdmin()">
+        <span id="adminLoginBtn">Yönetici Girişi</span>
+      </button>
+    </div>
+  </div>
+
+  <script src="js/translations.js"></script>
+  <script>
+    let currentLang = getCurrentLanguage();
+
+    // Initialize page
+    function initializePage() {
+      updateLanguage();
+      setActiveLanguageButton();
+    }
+
+    // Update all text based on current language
+    function updateLanguage() {
+      document.getElementById('mainTitle').textContent = t('mainTitle', currentLang);
+      document.getElementById('mainSubtitle').textContent = t('mainSubtitle', currentLang);
+      document.getElementById('healthCertTitle').textContent = t('healthCertificate', currentLang);
+      document.getElementById('microchipTitle').textContent = t('microchip', currentLang);
+      document.getElementById('searchTitle').textContent = t('searchAppointment', currentLang);
+      document.getElementById('adminLoginBtn').textContent = t('adminLogin', currentLang);
+      document.title = t('mainTitle', currentLang);
+    }
+
+    // Set active language button
+    function setActiveLanguageButton() {
+      document.querySelectorAll('.language-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.lang === currentLang) {
+          btn.classList.add('active');
+        }
+      });
+    }
+
+    // Language button click handlers
+    document.querySelectorAll('.language-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentLang = btn.dataset.lang;
+        setCurrentLanguage(currentLang);
+        updateLanguage();
+        setActiveLanguageButton();
+      });
+    });
+
+    // Navigation functions
+    function goToCitizen(mode, type) {
+      let url = `citizen.html?mode=${mode}&lang=${currentLang}`;
+      if (type) {
+        url += `&type=${type}`;
+      }
+      window.location.href = url;
+    }
+
+    function goToAdmin() {
+      window.location.href = `admin.html`;
+    }
+
+    // Initialize on load
+    initializePage();
+  </script>
+</body>
+
+</html>
