@@ -1,61 +1,59 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
+const { Pool } = require('pg');
 
-// Create database connection
-const db = new sqlite3.Database(path.join(__dirname, 'appointments.db'), (err) => {
-  if (err) {
-    console.error('Error opening database:', err.message);
-  } else {
-    console.log('Connected to SQLite database');
-    initializeDatabase();
+// Render'dan gelecek ortam değişkeni (Environment variable) üzerinden bağlanıyoruz
+const db = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
   }
 });
 
-// Initialize database schema
-function initializeDatabase() {
-  // Create appointments table
-  db.run(`
-    CREATE TABLE IF NOT EXISTS appointments (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      appointment_number TEXT UNIQUE NOT NULL,
-      appointment_type TEXT NOT NULL,
-      full_name TEXT NOT NULL,
-      phone TEXT NOT NULL,
-      country TEXT,
-      animal_type TEXT NOT NULL,
-      animal_count INTEGER NOT NULL,
-      appointment_date TEXT NOT NULL,
-      appointment_time TEXT NOT NULL,
-      status TEXT DEFAULT 'active',
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `, (err) => {
-    if (err) {
-      console.error('Error creating appointments table:', err.message);
-    } else {
-      console.log('Appointments table ready');
-    }
-  });
+db.connect()
+  .then(() => {
+    console.log('PostgreSQL (Supabase) veritabanina baglanildi');
+    initializeDatabase();
+  })
+  .catch(err => console.error('Veritabanina baglanirken hata:', err.stack));
 
-  // Create holidays table
-  db.run(`
-    CREATE TABLE IF NOT EXISTS holidays (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      holiday_date TEXT NOT NULL UNIQUE,
-      holiday_name TEXT NOT NULL
-    )
-  `, (err) => {
-    if (err) {
-      console.error('Error creating holidays table:', err.message);
-    } else {
-      console.log('Holidays table ready');
-      seedHolidays();
-    }
-  });
+async function initializeDatabase() {
+  try {
+    // Randevular tablosu
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS appointments (
+        id SERIAL PRIMARY KEY,
+        appointment_number VARCHAR(255) UNIQUE NOT NULL,
+        appointment_type VARCHAR(255) NOT NULL,
+        full_name VARCHAR(255) NOT NULL,
+        phone VARCHAR(255) NOT NULL,
+        country VARCHAR(255),
+        animal_type VARCHAR(255) NOT NULL,
+        animal_count INTEGER NOT NULL,
+        appointment_date VARCHAR(255) NOT NULL,
+        appointment_time VARCHAR(255) NOT NULL,
+        status VARCHAR(50) DEFAULT 'active',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    console.log('Appointments tablosu hazir');
+
+    // Tatiller tablosu
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS holidays (
+        id SERIAL PRIMARY KEY,
+        holiday_date VARCHAR(255) NOT NULL UNIQUE,
+        holiday_name VARCHAR(255) NOT NULL
+      )
+    `);
+    console.log('Holidays tablosu hazir');
+
+    // Tatilleri ekle (Varsa atlar)
+    seedHolidays();
+  } catch (err) {
+    console.error('Veritabani tablolarini olustururken hata:', err.message);
+  }
 }
 
-// Seed initial holidays (2026 Turkish public holidays)
-function seedHolidays() {
+async function seedHolidays() {
   const holidays = [
     { date: '2026-01-01', name: 'Yılbaşı' },
     { date: '2026-03-31', name: 'Ramazan Bayramı 1. Gün' },
@@ -73,11 +71,12 @@ function seedHolidays() {
     { date: '2026-10-29', name: 'Cumhuriyet Bayramı' }
   ];
 
-  const stmt = db.prepare('INSERT OR IGNORE INTO holidays (holiday_date, holiday_name) VALUES (?, ?)');
-  holidays.forEach(holiday => {
-    stmt.run(holiday.date, holiday.name);
-  });
-  stmt.finalize();
+  for (const holiday of holidays) {
+    await db.query(
+      'INSERT INTO holidays (holiday_date, holiday_name) VALUES ($1, $2) ON CONFLICT (holiday_date) DO NOTHING',
+      [holiday.date, holiday.name]
+    );
+  }
 }
 
 module.exports = db;
